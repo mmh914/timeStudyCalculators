@@ -1,152 +1,59 @@
-﻿(() => {
+(() => {
   "use strict";
-  const D = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    now = () => new Date(),
-    monday = (d) => {
-      let x = new Date(d),
-        n = x.getDay();
-      x.setDate(x.getDate() - (n === 0 ? 6 : n - 1));
-      x.setHours(0, 0, 0, 0);
-      return x;
-    },
-    ws = monday(now()),
-    key = `fieldWeek:${ws.getFullYear()}-${ws.getMonth() + 1}-${ws.getDate()}`,
-    base = {
-      minimum: 7,
-      times: Object.fromEntries(D.map((d) => [d, { start: "", end: "" }])),
-    };
-  let s;
-  try {
-    let v = JSON.parse(localStorage.getItem(key));
-    s = {
-      minimum: Number(v?.minimum) || 7,
-      times: Object.fromEntries(
-        D.map((d) => [
-          d,
-          { start: v?.times?.[d]?.start || "", end: v?.times?.[d]?.end || "" },
-        ]),
-      ),
-    };
-  } catch {
-    s = base;
-  }
-  const $ = (q) => document.querySelector(q),
-    idx = () => {
-      let d = now().getDay();
-      return d > 0 && d < 6 ? d - 1 : -1;
-    },
-    date = (i) => {
-      let d = new Date(ws);
-      d.setDate(d.getDate() + i);
-      return d;
-    },
-    mins = (v) => {
-      if (!v) return null;
-      let [a, b] = v.split(":").map(Number);
-      return a * 60 + b;
-    },
-    elapsed = (e, live) => {
-      let a = mins(e.start),
-        b = mins(e.end);
-      if (a === null) return 0;
-      if (b === null && live) {
-        let n = now();
-        b = n.getHours() * 60 + n.getMinutes() + n.getSeconds() / 60;
-      }
-      if (b === null) return 0;
-      if (b < a) b += 1440;
-      return Math.max(0, b - a);
-    },
-    dur = (n) =>
-      `${Math.floor(Math.max(0, Math.round(n)) / 60)}h ${String(Math.max(0, Math.round(n)) % 60).padStart(2, "0")}m`,
-    clock = (n) => {
-      n = ((Math.round(n) % 1440) + 1440) % 1440;
-      return new Date(
-        2000,
-        0,
-        1,
-        Math.floor(n / 60),
-        n % 60,
-      ).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-    },
-    save = () => {
-      localStorage.setItem(key, JSON.stringify(s));
-      $("#saved").textContent = "✓ Saved just now";
-      setTimeout(
-        () => ($("#saved").textContent = "✓ Saved on this device"),
-        1200,
-      );
-    };
+  const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  const now = () => new Date();
+  const monday = (date) => { const result = new Date(date); const day = result.getDay(); result.setDate(result.getDate() - (day === 0 ? 6 : day - 1)); result.setHours(0, 0, 0, 0); return result; };
+  const weekStart = monday(now());
+  const weekKey = `fieldWeek:${weekStart.getFullYear()}-${weekStart.getMonth() + 1}-${weekStart.getDate()}`;
+  const settingsKey = "fieldWeek:settings";
+  const emptyDay = () => ({ start: "", end: "", dayOff: false });
+  const savedWeek = read(weekKey, {});
+  const savedSettings = read(settingsKey, {});
+  const state = {
+    minimum: Number.isFinite(Number(savedSettings.minimum)) ? Number(savedSettings.minimum) : (Number(savedWeek.minimum) || 7),
+    times: Object.fromEntries(DAYS.map((day) => { const saved = savedWeek.times?.[day] || {}; return [day, { ...emptyDay(), ...saved, dayOff: saved.dayOff ?? (["off", "holiday", "vacation", "sick"].includes(saved.type)) }]; }))
+  };
+  const $ = (selector) => document.querySelector(selector);
+  function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; } }
+  function todayIndex() { const day = now().getDay(); return day > 0 && day < 6 ? day - 1 : -1; }
+  function dayDate(index) { const date = new Date(weekStart); date.setDate(date.getDate() + index); return date; }
+  function toMinutes(value) { if (!value) return null; const [hours, minutes] = value.split(":").map(Number); return hours * 60 + minutes; }
+  function worked(entry, live = false) { const start = toMinutes(entry.start); let end = toMinutes(entry.end); if (start === null || entry.dayOff) return 0; if (end === null && live) { const current = now(); end = current.getHours() * 60 + current.getMinutes(); } if (end === null || end < start) return 0; return end - start; }
+  function duration(value) { const minutes = Math.max(0, Math.round(value)); return `${Math.floor(minutes / 60)}h ${String(minutes % 60).padStart(2, "0")}m`; }
+  function clock(value) { const minutes = Math.max(0, Math.round(value)); return new Date(2000, 0, 1, Math.floor(minutes / 60), minutes % 60).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+  function currentTimeValue() { const current = now(); return `${String(current.getHours()).padStart(2, "0")}:${String(current.getMinutes()).padStart(2, "0")}`; }
+  function targetFor(entry) { return entry.dayOff ? 0 : state.minimum * 60; }
+  function save() { localStorage.setItem(settingsKey, JSON.stringify({ minimum: state.minimum })); localStorage.setItem(weekKey, JSON.stringify({ times: state.times })); $("#saved").textContent = "âœ“ Saved just now"; clearTimeout(save.timer); save.timer = setTimeout(() => $("#saved").textContent = "âœ“ Saved on this device", 1200); }
+  function issueFor(entry, index, today) { if (entry.dayOff) return ""; if (index < today && (!entry.start || !entry.end)) return "Missing time"; if (entry.start && entry.end && toMinutes(entry.end) < toMinutes(entry.start)) return "Check times"; return ""; }
+  function offControl(day, entry) { return `<label class="off-control"><input aria-label="${day} is a day off" type="checkbox" data-day="${day}" data-field="dayOff" ${entry.dayOff ? "checked" : ""}><span>Off</span></label>`; }
+  function timeControl(day, field, value, isToday) { return `<div class="time-control ${field}"><input aria-label="${day} ${field === "start" ? "first" : "last"} visit" type="time" data-day="${day}" data-field="${field}" value="${value}">${isToday ? `<button class="now-button" type="button" data-now-day="${day}" data-now-field="${field}">Now</button>` : ""}</div>`; }
   function render() {
-    let ti = idx();
-    $("#rows").innerHTML = D.map((day, i) => {
-      let e = s.times[day],
-        d = date(i),
-        sameday = i === ti,
-        t = elapsed(e, sameday);
-      return `<div class="row ${sameday ? "today" : ""}"><div class="day">${sameday ? "<i></i>" : ""}${day}<small>${d.toLocaleDateString([], { month: "short", day: "numeric" })}${sameday ? " · Today" : ""}</small></div><label><input aria-label="${day} first visit" type="time" data-day="${day}" data-field="start" value="${e.start}"></label><label><input aria-label="${day} last visit" type="time" data-day="${day}" data-field="end" value="${e.end}"></label><span class="total ${t ? "" : "empty"}">${t ? dur(t) : "—"}</span></div>`;
-    }).join("");
-    let daily = s.minimum * 60,
-      weekly = daily * 5,
-      vals = D.map((d, i) => elapsed(s.times[d], i === ti)),
-      week = vals.reduce((a, b) => a + b, 0),
-      today = ti >= 0 ? vals[ti] : 0;
-    $("#todayTotal").textContent = dur(today);
-    $("#weekTotal").textContent = dur(week);
-    $("#weekNote").textContent = `of ${dur(weekly)} weekly target`;
-    $("#progress").style.width =
-      `${weekly ? Math.min(100, (week / weekly) * 100) : 100}%`;
-    let e = ti >= 0 ? s.times[D[ti]] : null;
-    $("#todayNote").textContent =
-      ti < 0
-        ? "The workweek resumes Monday"
-        : !e.start
-          ? "Add today’s start time"
-          : !e.end
-            ? "Live since your first visit"
-            : "Today is complete";
-    if (ti < 0) {
-      $("#needed").textContent = "—";
-      $("#neededNote").textContent = "Available Monday through Friday";
-    } else if (!e.start) {
-      $("#needed").textContent = "—";
-      $("#neededNote").textContent = "Enter today’s start time";
-    } else {
-      let prior = vals.slice(0, ti).reduce((a, b) => a + b, 0),
-        through = daily * (ti + 1),
-        need = Math.max(0, through - prior);
-      $("#needed").textContent =
-        need === 0 ? "Target met" : clock(mins(e.start) + need);
-      $("#neededNote").textContent =
-        need === 0
-          ? "You’re already caught up through today"
-          : `To reach ${dur(through)} by end of today`;
+    const today = todayIndex();
+    const values = DAYS.map((day, index) => worked(state.times[day], index === today));
+    $("#rows").innerHTML = DAYS.map((day, index) => {
+      const entry = state.times[day]; const date = dayDate(index); const isToday = index === today; const value = values[index]; const issue = issueFor(entry, index, today);
+      return `<div class="row ${isToday ? "today" : ""}"><div class="day">${isToday ? "<i></i>" : ""}${day}<small>${date.toLocaleDateString([], { month: "short", day: "numeric" })}${isToday ? " · Today" : ""}</small>${issue ? `<span class="missing">${issue}</span>` : ""}</div>${offControl(day, entry)}${timeControl(day, "start", entry.start, isToday && !entry.dayOff)}${timeControl(day, "end", entry.end, isToday && !entry.dayOff)}<span class="total ${value ? "" : "empty"}">${value ? duration(value) : "—"}</span></div>`;
+    }).join("") + averageRow();
+    const weekTotal = values.reduce((sum, value) => sum + value, 0); const todayTotal = today >= 0 ? values[today] : 0;
+    $("#todayTotal").textContent = duration(todayTotal); $("#weekTotal").textContent = duration(weekTotal);
+    const todayEntry = today >= 0 ? state.times[DAYS[today]] : null;
+    $("#todayNote").textContent = today < 0 ? "The workweek resumes Monday" : todayEntry.dayOff ? "Day off" : !todayEntry.start ? "Add today’s start time" : !todayEntry.end ? "Live since your first visit" : "Today is complete";
+    if (today < 0) showNeeded("—", "Available Monday through Friday");
+    else if (targetFor(todayEntry) === 0) showNeeded("Not needed", "Day off");
+    else if (!todayEntry.start) showNeeded("—", "Enter today’s start time");
+    else {
+      const targetSoFar = DAYS.slice(0, today + 1).reduce((sum, day) => sum + targetFor(state.times[day]), 0);
+      const priorWorked = values.slice(0, today).reduce((sum, value) => sum + value, 0);
+      const neededToday = Math.max(0, targetSoFar - priorWorked);
+      showNeeded(neededToday === 0 ? "Target met" : clock(toMinutes(todayEntry.start) + neededToday), neededToday === 0 ? "Week-to-date minimum reached" : `${duration(neededToday)} needed today`);
     }
-    let n = now();
-    $("#clock").textContent = n.toLocaleString([], {
-      weekday: "long",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
+    $("#clock").textContent = now().toLocaleString([], { weekday: "long", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   }
-  let end = date(4);
-  $("#weekRange").textContent =
-    `${ws.toLocaleDateString([], { month: "long", day: "numeric" })}–${end.toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" })}`;
-  $("#minimum").value = s.minimum;
-  $("#minimum").addEventListener("input", (e) => {
-    s.minimum = Math.max(0, Number(e.target.value) || 0);
-    save();
-    render();
-  });
-  $("#rows").addEventListener("input", (e) => {
-    let x = e.target;
-    if (!x.dataset.day) return;
-    s.times[x.dataset.day][x.dataset.field] = x.value;
-    save();
-    render();
-  });
-  render();
-  setInterval(render, 30000);
+  function showNeeded(value, note) { $("#needed").textContent = value; $("#neededNote").textContent = note; }
+  function averageRow() { const completed = DAYS.map((day) => state.times[day]).filter((entry) => !entry.dayOff && entry.start && entry.end && toMinutes(entry.end) >= toMinutes(entry.start)); if (!completed.length) return ""; const avg = (field) => completed.reduce((sum, entry) => sum + toMinutes(entry[field]), 0) / completed.length; const total = completed.reduce((sum, entry) => sum + worked(entry), 0) / completed.length; return `<div class="row average-row"><div class="day">Averages<small>${completed.length} completed day${completed.length === 1 ? "" : "s"}</small></div><span></span><span>${clock(avg("start"))}</span><span>${clock(avg("end"))}</span><span class="total">${duration(total)}</span></div>`; }
+  const weekEnd = dayDate(4); $("#weekRange").textContent = `${weekStart.toLocaleDateString([], { month: "long", day: "numeric" })}â€“${weekEnd.toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" })}`; $("#minimum").value = state.minimum;
+  $("#minimum").addEventListener("input", (event) => { state.minimum = Math.max(0, Number(event.target.value) || 0); save(); render(); });
+  $("#rows").addEventListener("input", (event) => { const input = event.target; if (!input.dataset.day) return; state.times[input.dataset.day][input.dataset.field] = input.type === "checkbox" ? input.checked : input.value; save(); render(); });
+  $("#rows").addEventListener("click", (event) => { const button = event.target.closest("[data-now-day]"); if (!button) return; state.times[button.dataset.nowDay][button.dataset.nowField] = currentTimeValue(); save(); render(); });
+  render(); setInterval(() => { if (!document.activeElement?.matches("input, select")) render(); }, 30000);
 })();
