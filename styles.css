@@ -14,6 +14,31 @@
   --focus: #122a7333;
   --empty: #939aad;
 }
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --ink: #f5f7ff;
+    --muted: #aeb6cf;
+    --paper: #090e20;
+    --card: #121a33;
+    --line: #2d3859;
+    --green: #8198ff;
+    --lime: #202d5e;
+    --orange: #ff5b67;
+    --red: #ff5b67;
+    --today: #192344;
+    --field: #0d142a;
+    --focus: #8198ff66;
+    --empty: #78829d;
+  }
+  .stats .dark {
+    background: #243b91;
+  }
+  .dark small,
+  .dark em {
+    color: #dce2ff;
+  }
+}
 * {
   box-sizing: border-box;
 }
@@ -272,31 +297,6 @@ header span {
 }
 .privacy::first-letter {
   color: var(--green);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --ink: #f5f7ff;
-    --muted: #aeb6cf;
-    --paper: #090e20;
-    --card: #121a33;
-    --line: #2d3859;
-    --green: #8198ff;
-    --lime: #202d5e;
-    --orange: #ff5b67;
-    --red: #ff5b67;
-    --today: #192344;
-    --field: #0d142a;
-    --focus: #8198ff66;
-    --empty: #78829d;
-  }
-  .stats .dark {
-    background: #243b91;
-  }
-  .dark small,
-  .dark em {
-    color: #dce2ff;
-  }
 }
 @media (max-width: 760px) {
   .shell {

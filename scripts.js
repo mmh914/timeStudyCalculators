@@ -95,10 +95,10 @@
       JSON.stringify({ minimum: state.minimum }),
     );
     localStorage.setItem(weekKey, JSON.stringify({ times: state.times }));
-    $("#saved").textContent = "Ã¢Å“â€œ Saved just now";
+    $("#saved").textContent = "Saved just now";
     clearTimeout(save.timer);
     save.timer = setTimeout(
-      () => ($("#saved").textContent = "Ã¢Å“â€œ Saved on this device"),
+      () => ($("#saved").textContent = "Saved on this device"),
       1200,
     );
   }
@@ -131,7 +131,7 @@
         const isToday = index === today;
         const value = values[index];
         const issue = issueFor(entry, index, today);
-        return `<div class="row ${isToday ? "today" : ""}"><div class="day">${isToday ? "<i></i>" : ""}${day}<small>${date.toLocaleDateString([], { month: "short", day: "numeric" })}${isToday ? " Â· Today" : ""}</small>${issue ? `<span class="missing">${issue}</span>` : ""}</div>${offControl(day, entry)}${timeControl(day, "start", entry.start, isToday && !entry.dayOff)}${timeControl(day, "end", entry.end, isToday && !entry.dayOff)}<span class="total ${value ? "" : "empty"}">${value ? duration(value) : "â€”"}</span></div>`;
+        return `<div class="row ${isToday ? "today" : ""}"><div class="day">${isToday ? "<i></i>" : ""}${day}<small>${date.toLocaleDateString([], { month: "short", day: "numeric" })}${isToday ? " - Today" : ""}</small>${issue ? `<span class="missing">${issue}</span>` : ""}</div>${offControl(day, entry)}${timeControl(day, "start", entry.start, isToday && !entry.dayOff)}${timeControl(day, "end", entry.end, isToday && !entry.dayOff)}<span class="total ${value ? "" : "empty"}">${value ? duration(value) : "--"}</span></div>`;
       }).join("") + averageRow();
     const weekTotal = values.reduce((sum, value) => sum + value, 0);
     const todayTotal = today >= 0 ? values[today] : 0;
@@ -144,13 +144,13 @@
         : todayEntry.dayOff
           ? "Day off"
           : !todayEntry.start
-            ? "Add todayâ€™s start time"
+            ? "Add today's start time"
             : !todayEntry.end
               ? "Live since your first visit"
               : "Today is complete";
-    if (today < 0) showNeeded("â€”", "Available Monday through Friday");
+    if (today < 0) showNeeded("--", "Available Monday through Friday");
     else if (targetFor(todayEntry) === 0) showNeeded("Not needed", "Day off");
-    else if (!todayEntry.start) showNeeded("â€”", "Enter todayâ€™s start time");
+    else if (!todayEntry.start) showNeeded("--", "Enter today's start time");
     else {
       const targetSoFar = DAYS.slice(0, today + 1).reduce(
         (sum, day) => sum + targetFor(state.times[day]),
@@ -196,7 +196,7 @@
     const total =
       completed.reduce((sum, entry) => sum + worked(entry), 0) /
       completed.length;
-    return `<div class="row average-row"><div class="day">Averages<small>${completed.length} completed day${completed.length === 1 ? "" : "s"}</small></div><span></span><span>${clock(avg("start"))}</span><span>${clock(avg("end"))}</span><span class="total">${duration(total)}</span></div>`;
+        return `<div class="row ${isToday ? "today" : ""}"><div class="day">${isToday ? "<i></i>" : ""}${day}<small>${date.toLocaleDateString([], { month: "short", day: "numeric" })}${isToday ? " - Today" : ""}</small>${issue ? `<span class="missing">${issue}</span>` : ""}</div>${offControl(day, entry)}${timeControl(day, "start", entry.start, isToday && !entry.dayOff)}${timeControl(day, "end", entry.end, isToday && !entry.dayOff)}<span class="total ${value ? "" : "empty"}">${value ? duration(value) : "--"}</span></div>`;
   }
   const weekEnd = dayDate(4);
   $("#weekRange").textContent =
