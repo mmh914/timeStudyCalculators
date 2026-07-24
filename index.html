@@ -1,13 +1,1 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title>Time Study Calculator</title>
-        <link rel=""stylesheet" href="normalize.css" type="text/css">
-        <link rel="stylesheet" href="styles.css" type="text/css">
-    </head>
-
-    <body>
-
-
-        <script src="scripts.js" type="text/javascript"></script>
-    </body>
+﻿<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Field Week — Time Tracker</title><link rel="stylesheet" href="normalize.css"><link rel="stylesheet" href="styles.css"></head><body><main class="shell"><header><b>FIELD WEEK</b><span id="clock"></span></header><section class="hero"><div><p class="eyebrow">WEEKLY TIME TRACKER</p><h1>Make every visit count.</h1><p>Log the first and last visit of each day. Your hours and weekly pace update automatically.</p></div><label>DAILY MINIMUM <span><input id="minimum" type="number" min="0" max="24" step=".25" value="7"> hours</span></label></section><section class="stats"><article class="lime"><small>WORKED TODAY</small><strong id="todayTotal">0h 00m</strong><em id="todayNote">Add today’s start time</em></article><article><small>WORKED THIS WEEK</small><strong id="weekTotal">0h 00m</strong><em id="weekNote">of 35h 00m</em><div class="bar"><i id="progress"></i></div></article><article class="dark"><small>FINISH TIME NEEDED TODAY</small><strong id="needed">—</strong><em id="neededNote">Enter today’s start time</em></article></section><section class="week"><div class="weekhead"><div><p class="eyebrow">CURRENT WEEK</p><h2 id="weekRange"></h2></div><span id="saved">✓ Saved on this device</span></div><div class="thead"><b>Day</b><b>First visit</b><b>Last visit</b><b>Total</b></div><div id="rows"></div><p class="privacy">● Times are stored only in this browser.</p></section></main><script src="scripts.js"></script></body></html>
