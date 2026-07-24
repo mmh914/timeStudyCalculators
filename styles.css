@@ -352,3 +352,16 @@ header span {
     display: none;
   }
 }
+
+@media (max-width: 600px) and (orientation: portrait) {
+  .row .day {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .row .off-control {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+}
