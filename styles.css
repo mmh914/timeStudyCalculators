@@ -1,5 +1,6 @@
 :root {
   color-scheme: light;
+  --font-sans: "Segoe UI", Arial, sans-serif;
   --ink: #101b3f;
   --muted: #626a82;
   --paper: #f5f7fc;
@@ -13,6 +14,9 @@
   --field: #fff;
   --focus: #122a7333;
   --empty: #939aad;
+}
+[hidden] {
+  display: none !important;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -47,7 +51,7 @@ body {
   min-height: 100vh;
   color: var(--ink);
   background: var(--paper);
-  font-family: Inter, system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 .shell {
   width: min(1120px, calc(100% - 32px));
@@ -134,9 +138,7 @@ header span {
 }
 .stats strong {
   display: block;
-  font:
-    700 clamp(30px, 3.5vw, 41px) Georgia,
-    serif;
+  font: 700 clamp(30px, 3.5vw, 41px) var(--font-sans);
   letter-spacing: -0.035em;
   white-space: nowrap;
 }
@@ -168,9 +170,7 @@ header span {
 }
 .week h2 {
   margin: 0;
-  font:
-    700 25px Georgia,
-    serif;
+  font: 700 25px var(--font-sans);
 }
 .weekhead > span {
   color: var(--green);

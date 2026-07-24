@@ -113,26 +113,38 @@
       return "Check times";
     return "";
   }
-  function offControl(day, entry) {
-    return `<label class="off-control"><input aria-label="${day} is a day off" type="checkbox" data-day="${day}" data-field="dayOff" ${entry.dayOff ? "checked" : ""}><span>Off</span></label>`;
-  }
-  function timeControl(day, field, value, isToday) {
-    return `<div class="time-control ${field}"><input aria-label="${day} ${field === "start" ? "first" : "last"} visit" type="time" data-day="${day}" data-field="${field}" value="${value}">${isToday ? `<button class="now-button" type="button" data-now-day="${day}" data-now-field="${field}">Now</button>` : ""}</div>`;
-  }
   function render() {
     const today = todayIndex();
     const values = DAYS.map((day, index) =>
       worked(state.times[day], index === today),
     );
-    $("#rows").innerHTML =
-      DAYS.map((day, index) => {
-        const entry = state.times[day];
-        const date = dayDate(index);
-        const isToday = index === today;
-        const value = values[index];
-        const issue = issueFor(entry, index, today);
-        return `<div class="row ${isToday ? "today" : ""}"><div class="day">${isToday ? "<i></i>" : ""}${day}<small>${date.toLocaleDateString([], { month: "short", day: "numeric" })}${isToday ? " - Today" : ""}</small>${issue ? `<span class="missing">${issue}</span>` : ""}</div>${offControl(day, entry)}${timeControl(day, "start", entry.start, isToday && !entry.dayOff)}${timeControl(day, "end", entry.end, isToday && !entry.dayOff)}<span class="total ${value ? "" : "empty"}">${value ? duration(value) : "--"}</span></div>`;
-      }).join("") + averageRow();
+    DAYS.forEach((day, index) => {
+      const entry = state.times[day];
+      const row = $(`[data-row-day="${day}"]`);
+      const isToday = index === today;
+      const value = values[index];
+      const issue = issueFor(entry, index, today);
+      row.classList.toggle("today", isToday);
+      row.querySelector(".day i").hidden = !isToday;
+      row.querySelector("[data-date]").textContent =
+        dayDate(index).toLocaleDateString([], {
+          month: "short",
+          day: "numeric",
+        }) + (isToday ? " - Today" : "");
+      const issueElement = row.querySelector("[data-issue]");
+      issueElement.textContent = issue;
+      issueElement.hidden = !issue;
+      row.querySelector("[data-field=dayOff]").checked = entry.dayOff;
+      row.querySelector("[data-field=start]").value = entry.start;
+      row.querySelector("[data-field=end]").value = entry.end;
+      row.querySelectorAll(".now-button").forEach((button) => {
+        button.hidden = !isToday || entry.dayOff;
+      });
+      const total = row.querySelector("[data-total]");
+      total.textContent = value ? duration(value) : "--";
+      total.classList.toggle("empty", !value);
+    });
+    renderAverage();
     const weekTotal = values.reduce((sum, value) => sum + value, 0);
     const todayTotal = today >= 0 ? values[today] : 0;
     $("#todayTotal").textContent = duration(todayTotal);
@@ -181,7 +193,7 @@
     $("#needed").textContent = value;
     $("#neededNote").textContent = note;
   }
-  function averageRow() {
+  function renderAverage() {
     const completed = DAYS.map((day) => state.times[day]).filter(
       (entry) =>
         !entry.dayOff &&
@@ -189,14 +201,20 @@
         entry.end &&
         toMinutes(entry.end) >= toMinutes(entry.start),
     );
-    if (!completed.length) return "";
+    const row = $("#averageRow");
+    row.hidden = !completed.length;
+    if (!completed.length) return;
     const avg = (field) =>
       completed.reduce((sum, entry) => sum + toMinutes(entry[field]), 0) /
       completed.length;
     const total =
       completed.reduce((sum, entry) => sum + worked(entry), 0) /
       completed.length;
-        return `<div class="row ${isToday ? "today" : ""}"><div class="day">${isToday ? "<i></i>" : ""}${day}<small>${date.toLocaleDateString([], { month: "short", day: "numeric" })}${isToday ? " - Today" : ""}</small>${issue ? `<span class="missing">${issue}</span>` : ""}</div>${offControl(day, entry)}${timeControl(day, "start", entry.start, isToday && !entry.dayOff)}${timeControl(day, "end", entry.end, isToday && !entry.dayOff)}<span class="total ${value ? "" : "empty"}">${value ? duration(value) : "--"}</span></div>`;
+    $("#averageNote").textContent =
+      `${completed.length} completed day${completed.length === 1 ? "" : "s"}`;
+    $("#averageStart").textContent = clock(avg("start"));
+    $("#averageEnd").textContent = clock(avg("end"));
+    $("#averageTotal").textContent = duration(total);
   }
   const weekEnd = dayDate(4);
   $("#weekRange").textContent =

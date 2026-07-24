@@ -1,32 +1,298 @@
-<!doctype html>
+-<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Time Study Tracker</title>
-  <link rel="stylesheet" href="normalize.css" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <main class="shell">
-    <header><b>TIME STUDY TRACKER</b><span id="clock"></span></header>
-    <section class="settings" aria-label="Time settings">
-      <label for="minimum">Daily minimum</label>
-      <input id="minimum" type="number" min="0" max="24" step=".25" value="7" />
-      <span>hours</span>
-    </section>
-    <section class="stats">
-      <article class="lime"><small>WORKED TODAY</small><strong id="todayTotal">0h 00m</strong><em id="todayNote">Add today’s start time</em></article>
-      <article><small>WORKED THIS WEEK</small><strong id="weekTotal">0h 00m</strong><em id="weekNote">Monday–Friday total</em></article>
-      <article class="dark"><small>FINISH TIME NEEDED TODAY</small><strong id="needed">—</strong><em id="neededNote">Enter today’s start time</em></article>
-    </section>
-    <section class="week">
-      <div class="weekhead"><div><p class="eyebrow">CURRENT WEEK</p><h2 id="weekRange"></h2></div><span id="saved">✓ Saved on this device</span></div>
-      <div class="thead"><b>Day</b><b>Off</b><b>First visit</b><b>Last visit</b><b>Total</b></div>
-      <div id="rows"></div>
-      <p class="privacy">● Times are stored only in this browser.</p>
-    </section>
-  </main>
-  <script src="scripts.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Time Study Tracker</title>
+    <link rel="stylesheet" href="normalize.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header><b>TIME STUDY TRACKER</b><span id="clock"></span></header>
+      <section class="settings" aria-label="Time settings">
+        <label for="minimum">Daily minimum</label>
+        <input
+          id="minimum"
+          type="number"
+          min="0"
+          max="24"
+          step=".25"
+          value="7"
+        />
+        <span>hours</span>
+      </section>
+      <section class="stats">
+        <article class="lime">
+          <small>WORKED TODAY</small><strong id="todayTotal">0h 00m</strong
+          ><em id="todayNote">Add today's start time</em>
+        </article>
+        <article>
+          <small>WORKED THIS WEEK</small><strong id="weekTotal">0h 00m</strong
+          ><em id="weekNote">Monday-Friday total</em>
+        </article>
+        <article class="dark">
+          <small>FINISH TIME NEEDED TODAY</small><strong id="needed">—</strong
+          ><em id="neededNote">Enter today's start time</em>
+        </article>
+      </section>
+      <section class="week">
+        <div class="weekhead">
+          <div>
+            <p class="eyebrow">CURRENT WEEK</p>
+            <h2 id="weekRange"></h2>
+          </div>
+          <span id="saved">✓ Saved on this device</span>
+        </div>
+        <div class="thead">
+          <b>Day</b><b>Off</b><b>First visit</b><b>Last visit</b><b>Total</b>
+        </div>
+        <div id="rows">
+          <div class="row" data-row-day="Monday">
+            <div class="day">
+              <i hidden></i>Monday<small data-date></small
+              ><span class="missing" data-issue hidden></span>
+            </div>
+            <label class="off-control"
+              ><input
+                aria-label="Monday is a day off"
+                type="checkbox"
+                data-day="Monday"
+                data-field="dayOff"
+              /><span>Off</span></label
+            >
+            <div class="time-control start">
+              <input
+                aria-label="Monday first visit"
+                type="time"
+                data-day="Monday"
+                data-field="start"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Monday"
+                data-now-field="start"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <div class="time-control end">
+              <input
+                aria-label="Monday last visit"
+                type="time"
+                data-day="Monday"
+                data-field="end"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Monday"
+                data-now-field="end"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <span class="total empty" data-total>--</span>
+          </div>
+          <div class="row" data-row-day="Tuesday">
+            <div class="day">
+              <i hidden></i>Tuesday<small data-date></small
+              ><span class="missing" data-issue hidden></span>
+            </div>
+            <label class="off-control"
+              ><input
+                aria-label="Tuesday is a day off"
+                type="checkbox"
+                data-day="Tuesday"
+                data-field="dayOff"
+              /><span>Off</span></label
+            >
+            <div class="time-control start">
+              <input
+                aria-label="Tuesday first visit"
+                type="time"
+                data-day="Tuesday"
+                data-field="start"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Tuesday"
+                data-now-field="start"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <div class="time-control end">
+              <input
+                aria-label="Tuesday last visit"
+                type="time"
+                data-day="Tuesday"
+                data-field="end"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Tuesday"
+                data-now-field="end"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <span class="total empty" data-total>--</span>
+          </div>
+          <div class="row" data-row-day="Wednesday">
+            <div class="day">
+              <i hidden></i>Wednesday<small data-date></small
+              ><span class="missing" data-issue hidden></span>
+            </div>
+            <label class="off-control"
+              ><input
+                aria-label="Wednesday is a day off"
+                type="checkbox"
+                data-day="Wednesday"
+                data-field="dayOff"
+              /><span>Off</span></label
+            >
+            <div class="time-control start">
+              <input
+                aria-label="Wednesday first visit"
+                type="time"
+                data-day="Wednesday"
+                data-field="start"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Wednesday"
+                data-now-field="start"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <div class="time-control end">
+              <input
+                aria-label="Wednesday last visit"
+                type="time"
+                data-day="Wednesday"
+                data-field="end"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Wednesday"
+                data-now-field="end"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <span class="total empty" data-total>--</span>
+          </div>
+          <div class="row" data-row-day="Thursday">
+            <div class="day">
+              <i hidden></i>Thursday<small data-date></small
+              ><span class="missing" data-issue hidden></span>
+            </div>
+            <label class="off-control"
+              ><input
+                aria-label="Thursday is a day off"
+                type="checkbox"
+                data-day="Thursday"
+                data-field="dayOff"
+              /><span>Off</span></label
+            >
+            <div class="time-control start">
+              <input
+                aria-label="Thursday first visit"
+                type="time"
+                data-day="Thursday"
+                data-field="start"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Thursday"
+                data-now-field="start"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <div class="time-control end">
+              <input
+                aria-label="Thursday last visit"
+                type="time"
+                data-day="Thursday"
+                data-field="end"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Thursday"
+                data-now-field="end"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <span class="total empty" data-total>--</span>
+          </div>
+          <div class="row" data-row-day="Friday">
+            <div class="day">
+              <i hidden></i>Friday<small data-date></small
+              ><span class="missing" data-issue hidden></span>
+            </div>
+            <label class="off-control"
+              ><input
+                aria-label="Friday is a day off"
+                type="checkbox"
+                data-day="Friday"
+                data-field="dayOff"
+              /><span>Off</span></label
+            >
+            <div class="time-control start">
+              <input
+                aria-label="Friday first visit"
+                type="time"
+                data-day="Friday"
+                data-field="start"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Friday"
+                data-now-field="start"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <div class="time-control end">
+              <input
+                aria-label="Friday last visit"
+                type="time"
+                data-day="Friday"
+                data-field="end"
+              /><button
+                class="now-button"
+                type="button"
+                data-now-day="Friday"
+                data-now-field="end"
+                hidden
+              >
+                Now
+              </button>
+            </div>
+            <span class="total empty" data-total>--</span>
+          </div>
+          <div class="row average-row" id="averageRow" hidden>
+            <div class="day">Averages<small id="averageNote"></small></div>
+            <span></span><span id="averageStart"></span
+            ><span id="averageEnd"></span
+            ><span class="total" id="averageTotal"></span>
+          </div>
+        </div>
+        <p class="privacy">● Times are stored only in this browser.</p>
+      </section>
+    </main>
+    <script src="scripts.js"></script>
+  </body>
 </html>
