@@ -194,7 +194,7 @@
       total.classList.toggle("empty", !value);
     });
     // Update the averages after the weekday rows.
-    renderAverage();
+    renderAverage(values);
     // Add every day together for the weekly total.
     const weekTotal = values.reduce((sum, value) => sum + value, 0);
     const todayTotal = today >= 0 ? values[today] : 0;
@@ -252,8 +252,17 @@
     $("#needed").textContent = value;
     $("#neededNote").textContent = note;
   }
-  // Average only valid, fully completed workdays.
-  function renderAverage() {
+  // Update the week-to-date and completed-day averages.
+  function renderAverage(values) {
+    const recorded = values.filter((value) => value > 0);
+    $("#weekAverage").textContent = recorded.length
+      ? duration(
+          recorded.reduce((sum, value) => sum + value, 0) / recorded.length,
+        )
+      : duration(0);
+    $("#weekAverageNote").textContent = recorded.length
+      ? `${recorded.length} recorded day${recorded.length === 1 ? "" : "s"}`
+      : "No workdays recorded";
     const completed = DAYS.map((day) => state.times[day]).filter(
       (entry) =>
         !entry.dayOff &&
