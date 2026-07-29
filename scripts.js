@@ -194,7 +194,7 @@
       total.classList.toggle("empty", !value);
     });
     // Update the averages after the weekday rows.
-    renderAverage(values);
+    renderAverage(values, today);
     // Add every day together for the weekly total.
     const weekTotal = values.reduce((sum, value) => sum + value, 0);
     const todayTotal = today >= 0 ? values[today] : 0;
@@ -253,8 +253,11 @@
     $("#neededNote").textContent = note;
   }
   // Update the week-to-date and completed-day averages.
-  function renderAverage(values) {
-    const recorded = values.filter((value) => value > 0);
+  function renderAverage(values, today) {
+    const recorded = values.filter(
+      (value, index) =>
+        value > 0 && (index !== today || state.times[DAYS[index]].end),
+    );
     $("#weekAverage").textContent = recorded.length
       ? duration(
           recorded.reduce((sum, value) => sum + value, 0) / recorded.length,
