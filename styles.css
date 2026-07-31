@@ -149,11 +149,13 @@ header span {
   font-size: 12px;
   font-style: normal;
 }
-.week {
+.week,
+.yearToDate {
   padding: 18px 22px;
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--card);
+  margin-bottom: 12px;
 }
 .weekhead {
   display: flex;
@@ -180,9 +182,15 @@ header span {
 .thead,
 .row {
   display: grid;
-  grid-template-columns: 1.05fr 0.4fr 1.25fr 1.25fr 0.68fr;
   gap: 10px;
   align-items: center;
+}
+#weekThead,
+.row {
+  grid-template-columns: 1.05fr 0.4fr 1.25fr 1.25fr 0.68fr;
+}
+#yearToDateThead {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 .thead {
   height: 30px;
