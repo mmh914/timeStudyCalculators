@@ -252,6 +252,49 @@
     $("#needed").textContent = value;
     $("#neededNote").textContent = note;
   }
+  // Read a non-negative number from a year-to-date field.
+  function ytdNumber(selector, whole = false) {
+    const input = $(selector);
+    if (!input.value.trim()) return null;
+    const value = Number(input.value);
+    return Number.isFinite(value) && value >= 0 && (!whole || Number.isInteger(value))
+      ? value
+      : null;
+  }
+  // Estimate how many future workdays are needed to erase the shortfall.
+  function renderYtd() {
+    const daysWorked = ytdNumber("#ytdDaysWorked", true);
+    const averageHours = ytdNumber("#ytdAverageHours");
+    const hoursGoal = ytdNumber("#ytdHoursGoal");
+    const extraMinutes = ytdNumber("#ytdExtraMinutes", true);
+    const result = $("#ytdDaysNeeded");
+    if (
+      daysWorked === null ||
+      averageHours === null ||
+      hoursGoal === null ||
+      extraMinutes === null
+    ) {
+      result.value = "";
+      return;
+    }
+    const shortfall = Math.max(
+      0,
+      (hoursGoal - averageHours) * daysWorked,
+    );
+    if (shortfall === 0) {
+      result.value = "0 days";
+      return;
+    }
+    if (extraMinutes === 0) {
+      result.value = "";
+      return;
+    }
+    // Remove only floating-point noise near a whole-day boundary.
+    const exactDays = shortfall / (extraMinutes / 60);
+    const tolerance = Number.EPSILON * Math.max(1, Math.abs(exactDays));
+    const daysNeeded = Math.ceil(exactDays - tolerance);
+    result.value = `${daysNeeded} day${daysNeeded === 1 ? "" : "s"}`;
+  }
   // Update the week-to-date and completed-day averages.
   function renderAverage(values, today) {
     const recorded = values.filter(
@@ -308,6 +351,18 @@
     state.minimum = Math.max(0, Number(event.target.value) || 0);
     save();
     // Draw the page once as soon as the script loads.
+    render();
+  });
+  // Recalculate the temporary year-to-date helper while it is being edited.
+  $("#yearToDateThead").addEventListener("input", renderYtd);
+  // Use the goal plus the catch-up time as the main calculator's daily target.
+  $("#applyDailyMinimum").addEventListener("click", () => {
+    const hoursGoal = ytdNumber("#ytdHoursGoal");
+    const extraMinutes = ytdNumber("#ytdExtraMinutes", true);
+    if (hoursGoal === null || extraMinutes === null) return;
+    state.minimum = hoursGoal + extraMinutes / 60;
+    $("#minimum").value = Number(state.minimum.toFixed(4));
+    save();
     render();
   });
   // Listen for changes in any weekday input.

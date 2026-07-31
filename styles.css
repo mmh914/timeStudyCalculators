@@ -1,19 +1,22 @@
 :root {
   color-scheme: light;
   --font-sans: "Segoe UI", Arial, sans-serif;
-  --ink: #101b3f;
-  --muted: #626a82;
-  --paper: #f5f7fc;
-  --card: #fff;
-  --line: #d9deeb;
-  --green: #122a73;
-  --lime: #e8edff;
-  --orange: #e32636;
-  --red: #e32636;
-  --today: #f0f3ff;
-  --field: #fff;
-  --focus: #122a7333;
-  --empty: #939aad;
+  /* Mars Snacking: Mars navy and logo cyan, with confectionery gold. */
+  --ink: #17233b;
+  --muted: #58677a;
+  --paper: #f3f7f9;
+  --card: #ffffff;
+  --line: #cbd7df;
+  --brand: #003b70;
+  --brand-strong: #002b55;
+  --cyan: #007590;
+  --gold: #a35d00;
+  --danger: #b42332;
+  --today: #e5f4f7;
+  --field: #ffffff;
+  --focus: #00a6c744;
+  --empty: #68788a;
+  --stat-surface: #edf3f8;
 }
 [hidden] {
   display: none !important;
@@ -21,26 +24,21 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --ink: #f5f7ff;
-    --muted: #aeb6cf;
-    --paper: #090e20;
-    --card: #121a33;
-    --line: #2d3859;
-    --green: #8198ff;
-    --lime: #202d5e;
-    --orange: #ff5b67;
-    --red: #ff5b67;
-    --today: #192344;
-    --field: #0d142a;
-    --focus: #8198ff66;
-    --empty: #78829d;
-  }
-  .stats .dark {
-    background: #243b91;
-  }
-  .dark small,
-  .dark em {
-    color: #dce2ff;
+    --ink: #f4f8fb;
+    --muted: #b9c6d1;
+    --paper: #07151f;
+    --card: #102431;
+    --line: #34505f;
+    --brand: #7cc9e4;
+    --brand-strong: #004f78;
+    --cyan: #62d4e7;
+    --gold: #ffc857;
+    --danger: #ff8993;
+    --today: #143645;
+    --field: #0a1b27;
+    --focus: #62d4e766;
+    --empty: #91a4b4;
+    --stat-surface: #172e3d;
   }
 }
 * {
@@ -109,20 +107,26 @@ header span {
   margin-bottom: 12px;
 }
 .stats article {
+  position: relative;
+  overflow: hidden;
   min-height: 112px;
   padding: 17px 20px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: var(--card);
+  background: var(--stat-surface);
 }
-.stats .lime {
-  background: var(--lime);
-  border: 0;
+.stats article::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--stat-accent);
+  content: "";
 }
-.stats .dark {
-  color: white;
-  background: var(--green);
-  border: 0;
+.stats .stat-today { --stat-accent: var(--cyan); }
+.stats .stat-week { --stat-accent: var(--brand); }
+.stats .stat-average { --stat-accent: var(--gold); }
+.stats .stat-finish {
+  --stat-accent: var(--cyan);
 }
 .stats small {
   display: block;
@@ -132,10 +136,10 @@ header span {
   font-weight: 900;
   letter-spacing: 0.09em;
 }
-.dark small,
-.dark em {
-  color: #ffffffad;
-}
+.stat-today small { color: var(--cyan); }
+.stat-week small { color: var(--brand); }
+.stat-average small { color: var(--gold); }
+.stat-finish small { color: var(--cyan); }
 .stats strong {
   display: block;
   font: 700 clamp(30px, 3.5vw, 41px) var(--font-sans);
@@ -165,7 +169,7 @@ header span {
 }
 .eyebrow {
   margin: 0 0 3px;
-  color: var(--green);
+  color: var(--brand);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -175,7 +179,7 @@ header span {
   font: 700 25px var(--font-sans);
 }
 .weekhead > span {
-  color: var(--green);
+  color: var(--cyan);
   font-size: 11px;
   font-weight: 800;
 }
@@ -191,6 +195,9 @@ header span {
 }
 #yearToDateThead {
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  height: auto;
+  margin-top: 12px;
+  align-items: start;
 }
 .thead {
   height: 30px;
@@ -226,7 +233,7 @@ header span {
   height: 7px;
   margin-right: 7px;
   border-radius: 50%;
-  background: var(--orange);
+  background: var(--cyan);
 }
 .time-control {
   display: flex;
@@ -259,18 +266,18 @@ header span {
   height: 20px;
   margin: 0;
   padding: 0;
-  accent-color: var(--green);
+  accent-color: var(--brand);
 }
 .row input:focus {
   outline: 2px solid var(--focus);
-  border-color: var(--green);
+  border-color: var(--cyan);
 }
 .now-button {
   height: 34px;
   padding: 0 7px;
-  border: 1px solid var(--green);
+  border: 1px solid var(--brand);
   border-radius: 7px;
-  color: var(--green);
+  color: var(--brand);
   background: transparent;
   font-size: 10px;
   font-weight: 900;
@@ -289,7 +296,7 @@ header span {
 .missing {
   display: block;
   margin-top: 2px;
-  color: var(--red);
+  color: var(--danger);
   font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;
@@ -304,7 +311,57 @@ header span {
   font-size: 10px;
 }
 .privacy::first-letter {
-  color: var(--green);
+  color: var(--cyan);
+}
+.ytd-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
+}
+.ytd-field b {
+  min-height: 24px;
+}
+.ytd-field input {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--field);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-align: center;
+  text-transform: none;
+}
+.ytd-field input:focus {
+  outline: 2px solid var(--focus);
+  border-color: var(--cyan);
+}
+.ytd-field .ytd-result {
+  background: var(--today);
+}
+.apply-minimum {
+  min-height: 36px;
+  margin-top: 14px;
+  padding: 0 13px;
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  color: var(--brand);
+  background: transparent;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+.apply-minimum:hover {
+  background: var(--today);
+}
+.apply-minimum:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 @media (max-width: 760px) {
   .shell {
@@ -327,6 +384,13 @@ header span {
   }
   .thead {
     display: none;
+  }
+  #yearToDateThead {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ytd-field b {
+    min-height: auto;
   }
   .row {
     grid-template-columns: 1fr 1fr;
@@ -358,6 +422,12 @@ header span {
   }
   .average-row {
     display: none;
+  }
+}
+
+@media (max-width: 460px) {
+  #yearToDateThead {
+    grid-template-columns: 1fr;
   }
 }
 

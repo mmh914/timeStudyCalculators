@@ -23,20 +23,20 @@
         <span>hours</span>
       </section>
       <section class="stats">
-        <article class="lime">
+        <article class="stat-today">
           <small>WORKED TODAY</small><strong id="todayTotal">0h 00m</strong
           ><em id="todayNote">Add today's start time</em>
         </article>
-        <article>
+        <article class="stat-week">
           <small>WORKED THIS WEEK</small><strong id="weekTotal">0h 00m</strong
           ><em id="weekNote">Monday-Friday total</em>
         </article>
-        <article>
+        <article class="stat-average">
           <small>AVERAGE TIME SO FAR THIS WEEK</small
           ><strong id="weekAverage">0h 00m</strong
           ><em id="weekAverageNote">No workdays recorded</em>
         </article>
-        <article class="dark">
+        <article class="stat-finish">
           <small>FINISH TIME NEEDED TODAY</small><strong id="needed">—</strong
           ><em id="neededNote">Enter today's start time</em>
         </article>
@@ -300,8 +300,30 @@
       <section class="yearToDate">
         <p class="eyebrow">YEAR TO DATE</p>
         <div class="thead" id="yearToDateThead">
-          <b>Days Worked</b><b>Average Hours</b><b>Hours Goal</b><b>Extra Daily Minutes</b><b>Days Needed</b>
+          <label class="ytd-field" for="ytdDaysWorked">
+            <b>Days Worked</b>
+            <input id="ytdDaysWorked" type="number" min="0" step="1" inputmode="numeric" />
+          </label>
+          <label class="ytd-field" for="ytdAverageHours">
+            <b>Average Hours</b>
+            <input id="ytdAverageHours" type="number" min="0" step="any" inputmode="decimal" />
+          </label>
+          <label class="ytd-field" for="ytdHoursGoal">
+            <b>Hours Goal</b>
+            <input id="ytdHoursGoal" type="number" min="0" step="any" inputmode="decimal" />
+          </label>
+          <label class="ytd-field" for="ytdExtraMinutes">
+            <b>Extra Daily Minutes</b>
+            <input id="ytdExtraMinutes" type="number" min="0" step="1" inputmode="numeric" />
+          </label>
+          <label class="ytd-field" for="ytdDaysNeeded">
+            <b>Days Needed</b>
+            <input id="ytdDaysNeeded" class="ytd-result" type="text" placeholder="--" readonly aria-live="polite" />
+          </label>
         </div>
+        <button id="applyDailyMinimum" class="apply-minimum" type="button">
+          Apply Daily Minimum
+        </button>
       </section>
     </main>
     <script src="scripts.js"></script>
